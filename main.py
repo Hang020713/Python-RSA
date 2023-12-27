@@ -123,6 +123,8 @@ while True:
         continue
     print("D:", d)
 
+    break
+
     #Checking
     original_str = "abc"
     entropy = 0
