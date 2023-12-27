@@ -95,6 +95,8 @@ def getLCM(x, y):
    return lcm
 
 '''Main Program'''
+length = int(input('Key length: '))
+print(10 ** length, 10 ** (length + 1))
 e = 0
 d = 0
 t = 0
@@ -104,17 +106,19 @@ while(True):
     restart = False
 
     #Select two prime number, p & q
-    p = random.randint(50, 100)
-    q = random.randint(50, 100)
+    p = random.randint(10 ** length, 10 ** (length + 1))
+    q = random.randint(10 ** length, 10 ** (length + 1))
     if(not (isPrime(p) and isPrime(q)) or p == q):
         continue
+    print("p, q done")
 
     #Calculate product
     n = p * q
+    print("n done")
 
     #Calculate totient
     t = (p - 1) * (q - 1)
-    #print('t:', t)
+    print("t done")
 
     '''
     Public key:
@@ -122,17 +126,38 @@ while(True):
     2. less than totient
     3. NOT a factor of totient
     '''
+    tested = [False] * (t-5)
     while(True):
         e = random.randint(4, t-1)
+        print(e, end=' ')
+
+        #Check
+        tested[e-4] = True
+        for i in range(4, len(tested)):
+            if(not tested[i]): 
+                break
+            
+            restart = True
+            break
+
+        if(restart):
+            print('full')
+            break
 
         if(not isPrime(e)):
+            print('not prime')
             continue
 
         #if(t % e != 1):
         if(getGCD(e, t) != 1):
+            print("gcd failed")
             continue
 
         break
+    if(restart):
+        print("Build again")
+        continue
+    print("E done")
 
     #Private key
     #(D * E) MOD t == 1
@@ -155,30 +180,40 @@ while(True):
         if((d*e) % t == 1):
             break
     if(restart):
+        print("Build again")
         continue
+    print("D done")
 
     #End
     break
+print('[Key detail]')
 print('p:', p, type(p), ', q:', q, type(q))
 print('n:', n, type(n))
 print('t:', t, type(t))
 print('E:', e, type(e))
 print('D:', d, type(d))
 
-data = 99
+#Plain text
+plain_text = input('Enter plain text: ')
+data = []
+for i in range(len(plain_text)):
+    data.append(ord(plain_text[i]))
+print("Plain text conversion done")
 
 #Encryption, M^E MOD N
-#encrypt_data = math.pow(data, e) % n
-encrypt_data = (data ** e) % n
-print('[Encrypt]', encrypt_data)
+print('[Encrypting]')
+encrypt_data = []
+for i in range(len(data)):
+    tmp = (data[i] ** e) % n
+    encrypt_data.append(tmp)
+    print(tmp, end=' ')
+print()
 
 #Decryption, M^D MOD N
-#decrypt_data = math.pow(encrypt_data, d) % n
-decrypt_data = (encrypt_data ** d) % n
-print('[Decrypt]', decrypt_data)
-
-#Checking
-if(decrypt_data == data):
-    print("Success")
-else:
-    print("Failed")
+print('[Decrypting]')
+decrypt_data = []
+for i in range(len(encrypt_data)):
+    tmp = chr((encrypt_data[i] ** d) % n)
+    decrypt_data.append(tmp)
+    print(tmp, end=' ')
+print()
